@@ -1,0 +1,34 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REGISTRY_ID
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URL:latest .
+      - docker tag $REPOSITORY_URL:latest $REPOSITORY_URL:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URL:latest
+      - docker push $REPOSITORY_URL:$IMAGE_TAG
+      - echo Updating task definition file...
+      - sed -i 's@REPOSITORY_URL@'$REPOSITORY_URL'@g' taskdef.json
+      - sed -i 's@IMAGE_TAG@'$IMAGE_TAG'@g' taskdef.json
+      - sed -i 's@TASK_ROLE_ARN@'$TASK_ROLE_ARN'@g' taskdef.json
+      - sed -i 's@EXECUTION_ROLE_ARN@'$EXECUTION_ROLE_ARN'@g' taskdef.json
+      - sed -i 's@LOG_GROUP@'$LOG_GROUP'@g' taskdef.json
+      - sed -i 's@LOG_REGION@'$LOG_REGION'@g' taskdef.json
+      - sed -i 's@LOG_STREAM_PREFIX@'$LOG_STREAM_PREFIX'@g' taskdef.json
+artifacts:
+    files:
+      - appspec.yaml
+      - taskdef.json

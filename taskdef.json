@@ -1,0 +1,42 @@
+{
+    "containerDefinitions": [
+        {
+            "name": "web",
+            "image": "REPOSITORY_URL:IMAGE_TAG",
+            "portMappings": [
+                {
+                    "containerPort": 80,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "VERSION",
+                    "value": "blue"
+                },
+                {
+                    "name": "DATABASE_URI",
+                    "value": "mysql://admin:8o5EjeKnuWXIqDwf@homework-rds.cwk7whu396kl.ap-southeast-1.rds.amazonaws.com:3306/information_schema"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "LOG_GROUP",
+                    "awslogs-region": "LOG_REGION",
+                    "awslogs-stream-prefix": "LOG_STREAM_PREFIX"
+                }
+            }
+        }
+    ],
+    "family": "web",
+    "taskRoleArn": "TASK_ROLE_ARN",
+    "executionRoleArn": "EXECUTION_ROLE_ARN",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+}
