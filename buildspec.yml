@@ -28,6 +28,7 @@ phases:
       - sed -i 's@LOG_GROUP@'$LOG_GROUP'@g' taskdef.json
       - sed -i 's@LOG_REGION@'$LOG_REGION'@g' taskdef.json
       - sed -i 's@LOG_STREAM_PREFIX@'$LOG_STREAM_PREFIX'@g' taskdef.json
+      - sed -i 's|REPLACE_ME|'$DATABASE_URI'!g' taskdef.json
 artifacts:
     files:
       - appspec.yaml
